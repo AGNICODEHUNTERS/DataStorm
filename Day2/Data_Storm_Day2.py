@@ -85,7 +85,7 @@ model=lm().fit(x_train,y_train)
 predictions=model.predict(x_test)
 predictionR=[]
 for i in predictions:
-    predictionR.append(int(round(i)))
+    predictionR.append(abs(int(round(i))))
 datasheet = pd.DataFrame()
 datasheet.insert(0,"Client_ID",testData.Client_ID)
 datasheet.insert(1,"NEXT_MONTH_DEFAULT",pd.DataFrame(predictionR))
