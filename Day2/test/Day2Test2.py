@@ -94,15 +94,19 @@ normed_train_dat = normDat(train_dat)
 normed_test_dat = normDat(test_dat)
 model = buildModel()
 
-EPOCHS=300
+EPOCHS=1200
 history = model.fit(normed_train_dat,train_lab,epochs = EPOCHS,validation_split = 0.2,verbose = 0,callbacks=[tfdocs.modeling.EpochDots()])
 #loss, mae, mse = model.evaluate(normed_test_dat, test_lab, verbose=2)
 test_predictions = model.predict(normed_test_dat).flatten()
 tp=[]
 for i in test_predictions:
     fin=int(round(i))
-    tp.append(abs(fin))
+    if fin>1:
+        fin=1
+    if fin<0:
+        fin=0
+    tp.append(fin)
 dataSheet=pd.DataFrame()
-dataSheet.insert(0,"Client_ID",data.Client_ID)
+dataSheet.insert(0,"Client_ID",testData.Client_ID)
 dataSheet.insert(1,"NEXT_MONTH_DEFAULT",pd.DataFrame(tp))
 dataSheet.to_csv(r'AGNI_CODE_HUNTERS.csv')
