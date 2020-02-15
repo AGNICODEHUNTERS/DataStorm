@@ -89,6 +89,4 @@ for i in predictions:
 datasheet = pd.DataFrame()
 datasheet.insert(0,"Client_ID",testData.Client_ID)
 datasheet.insert(1,"NEXT_MONTH_DEFAULT",pd.DataFrame(predictionR))
-datasheet.to_csv(r'file.csv')
-
-plt.show()
+datasheet.to_csv(r'AGNI_CODE_HUNTERS.csv')

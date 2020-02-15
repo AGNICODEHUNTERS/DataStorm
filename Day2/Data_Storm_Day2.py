@@ -79,7 +79,7 @@ x_train=data.drop(["NEXT_MONTH_DEFAULT","Client_ID","Balance_Limit_V1","Gender",
 x_test=testData.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],axis=1)
 y_test=[]
 
-from sklearn.linear_model import LinearRegression as lm
+from sklearn.linear_model import RidgeCV as lm
 
 model=lm().fit(x_train,y_train)
 predictions=model.predict(x_test)
@@ -89,6 +89,4 @@ for i in predictions:
 datasheet = pd.DataFrame()
 datasheet.insert(0,"Client_ID",testData.Client_ID)
 datasheet.insert(1,"NEXT_MONTH_DEFAULT",pd.DataFrame(predictionR))
-datasheet.to_csv(r'file.csv')
-
-plt.show()
+datasheet.to_csv(r'AGNI_CODE_HUNTERS.csv')
