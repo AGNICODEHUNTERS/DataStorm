@@ -67,6 +67,19 @@ def numeric(dataSheet):
             dataSheet.insert(5,"ageF",pd.DataFrame(ageF))
             break
     return dataSheet
+<<<<<<< HEAD
 data=numeric(data)
 data=data.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],axis=1)
 print(data)
+=======
+
+data=numeric(data)
+data=data.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],axis=1)
+cols = [ f for f in data.columns if data.dtypes[ f ] != "object"]
+cols.remove('NEXT_MONTH_DEFAULT')
+print(data)
+f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT', value_vars=cols)
+g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=5, sharex=False, sharey=False )
+g = g.map( sns.distplot, "value", kde=True).add_legend()
+plt.show()
+>>>>>>> a0324e5b456353a47cbda9ae10834dc3e5254eff

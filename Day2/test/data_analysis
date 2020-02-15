@@ -14,6 +14,7 @@ cols.remove( output )
 print(cols)
 
 f = pd.melt( data, id_vars=output, value_vars=cols)
+print(f)
 g = sns.FacetGrid( f, hue=output, col="variable", col_wrap=5, sharex=False, sharey=False )
 g = g.map( sns.distplot, "value", kde=True).add_legend()
 
