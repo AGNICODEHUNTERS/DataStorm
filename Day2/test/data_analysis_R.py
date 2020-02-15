@@ -73,7 +73,7 @@ data=data.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARI
 cols = [ f for f in data.columns if data.dtypes[ f ] != "object"]
 cols.remove('NEXT_MONTH_DEFAULT')
 print(data)
-f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT', value_vars=cols)
+f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT',  value_vars=cols)
 g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=5, sharex=False, sharey=False )
 g = g.map( sns.distplot, "value", kde=True).add_legend()
 plt.show()
