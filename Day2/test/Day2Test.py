@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy.stats as stats
 
-data = pd.read_csv("../input/UCI_Credit_Card.csv")
-data.head(10)
+data = pd.read_csv("credit_card_default_test.csv")
+print(data.head(10))
 
-data.columns
+print(data.columns)
