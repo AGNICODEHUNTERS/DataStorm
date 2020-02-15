@@ -94,10 +94,10 @@ normed_train_dat = normDat(train_dat)
 normed_test_dat = normDat(test_dat)
 model = buildModel()
 
-EPOCHS=1200
-history = model.fit(normed_train_dat,train_lab,epochs = EPOCHS,validation_split = 0.2,verbose = 0,callbacks=[tfdocs.modeling.EpochDots()])
+EPOCHS=500
+history = model.fit(train_dat,train_lab,epochs = EPOCHS,validation_split = 0.2,verbose = 0,callbacks=[tfdocs.modeling.EpochDots()])
 #loss, mae, mse = model.evaluate(normed_test_dat, test_lab, verbose=2)
-test_predictions = model.predict(normed_test_dat).flatten()
+test_predictions = model.predict(test_dat).flatten()
 tp=[]
 for i in test_predictions:
     fin=int(round(i))
