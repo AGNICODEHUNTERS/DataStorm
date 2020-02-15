@@ -1,12 +1,13 @@
+import tensorflow as tf
 import pandas as pd
-
-from sklearn.model_selection import train_test_split
-
+import seaborn as sns
+import tensorflow_docs as tfdocs
+import tensorflow_docs.plots
+import tensorflow_docs.modeling
 import matplotlib.pyplot as plt
 
-data = pd.read_csv("credit_card_default_train.csv",header=0)
-testData = pd.read_csv("credit_card_default_test.csv",header=0)
-
+dataSetT = pd.read_csv("credit_card_default_train.csv",header=0)
+dataSetTs = pd.read_csv("credit_card_default_test.csv",header=0)
 
 def numeric(dataSheet):
     bal = dataSheet.Balance_Limit_V1
@@ -68,25 +69,44 @@ def numeric(dataSheet):
             break
     return dataSheet
 
+def normDat(dataSet):
+    return (dataSet-train_stats['mean'])/train_stats['std']
+
+def buildModel():
+    model = tf.keras.Sequential([tf.keras.layers.Dense(64,activation='relu',input_shape=[len(train_dat.keys())]),tf.keras.layers.Dense(64,activation='relu'),tf.keras.layers.Dense(1)])
+    optimizer = tf.keras.optimizers.RMSprop(0.001)
+    model.compile(loss='mse',optimizer=optimizer,metrics=['mae','mse'])
+    return model
+
+data=numeric(dataSetT)
+testData=numeric(dataSetTs)
 
 
-data=numeric(data)
-testData=numeric(testData)
-print(data)
+train_dat=data.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],axis=1)
+test_dat=testData.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],axis=1)
 
-y_train=data.NEXT_MONTH_DEFAULT
-x_train=data.drop(["NEXT_MONTH_DEFAULT","Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],axis=1)
-x_test=testData.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],axis=1)
-y_test=[]
 
-from sklearn.linear_model import RidgeCV as lm
+train_lab = train_dat.pop("NEXT_MONTH_DEFAULT")
 
-model=lm().fit(x_train,y_train)
-predictions=model.predict(x_test)
-predictionR=[]
-for i in predictions:
-    predictionR.append(abs(int(round(i))))
-datasheet = pd.DataFrame()
-datasheet.insert(0,"Client_ID",testData.Client_ID)
-datasheet.insert(1,"NEXT_MONTH_DEFAULT",pd.DataFrame(predictionR))
-datasheet.to_csv(r'AGNI_CODE_HUNTERS.csv')
+train_stats=train_dat.describe()
+train_stats = train_stats.transpose()
+normed_train_dat = normDat(train_dat)
+normed_test_dat = normDat(test_dat)
+model = buildModel()
+
+EPOCHS=500
+history = model.fit(normed_train_dat,train_lab,epochs = EPOCHS,validation_split = 0.2,verbose = 0,callbacks=[tfdocs.modeling.EpochDots()])
+#loss, mae, mse = model.evaluate(normed_test_dat, test_lab, verbose=2)
+test_predictions = model.predict(normed_test_dat).flatten()
+tp=[]
+for i in test_predictions:
+    fin=int(round(i))
+    if fin>1:
+        fin=1
+    if fin<0:
+        fin=0
+    tp.append(fin)
+dataSheet=pd.DataFrame()
+dataSheet.insert(0,"Client_ID",testData.Client_ID)
+dataSheet.insert(1,"NEXT_MONTH_DEFAULT",pd.DataFrame(tp))
+dataSheet.to_csv(r'AGNI_CODE_HUNTERS.csv')
