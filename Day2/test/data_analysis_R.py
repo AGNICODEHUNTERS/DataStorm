@@ -5,7 +5,8 @@ import scipy.stats as stats
 import seaborn as sns
 
 data = pd.read_csv("credit_card_default_train.csv")
-testData=pd.read_csv("credit_card_default_test")
+
+#testData=pd.read_csv("credit_card_default_test")
 
 def numeric(dataSheet):
     bal = dataSheet.Balance_Limit_V1
@@ -66,3 +67,6 @@ def numeric(dataSheet):
             dataSheet.insert(5,"ageF",pd.DataFrame(ageF))
             break
     return dataSheet
+data=numeric(data)
+data=data.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],axis=1)
+print(data)
