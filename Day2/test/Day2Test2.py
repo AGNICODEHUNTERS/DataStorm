@@ -87,7 +87,6 @@ test_dat=testData.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATU
 
 
 train_lab = train_dat.pop("NEXT_MONTH_DEFAULT")
-test_lab = test_dat.pop("NEXT_MONTH_DEFAULT")
 
 train_stats=train_dat.describe()
 train_stats = train_stats.transpose()
@@ -95,9 +94,9 @@ normed_train_dat = normDat(train_dat)
 normed_test_dat = normDat(test_dat)
 model = buildModel()
 
-EPOCHS=1000
+EPOCHS=300
 history = model.fit(normed_train_dat,train_lab,epochs = EPOCHS,validation_split = 0.2,verbose = 0,callbacks=[tfdocs.modeling.EpochDots()])
-loss, mae, mse = model.evaluate(normed_test_dat, test_lab, verbose=2)
+#loss, mae, mse = model.evaluate(normed_test_dat, test_lab, verbose=2)
 test_predictions = model.predict(normed_test_dat).flatten()
 tp=[]
 for i in test_predictions:
@@ -107,4 +106,3 @@ dataSheet=pd.DataFrame()
 dataSheet.insert(0,"Client_ID",data.Client_ID)
 dataSheet.insert(1,"NEXT_MONTH_DEFAULT",pd.DataFrame(tp))
 dataSheet.to_csv(r'AGNI_CODE_HUNTERS.csv')
-print(count/len(train_lab))
