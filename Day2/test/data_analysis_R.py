@@ -76,4 +76,38 @@ print(data)
 f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT',  value_vars=cols)
 g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=5, sharex=False, sharey=False )
 g = g.map( sns.distplot, "value", kde=True).add_legend()
-plt.show()
+
+
+def CSTOW ( inputdata, inputvariable, OutcomeCategory ):
+    OutcomeCategoryTable = inputdata.groupby( OutcomeCategory )[ OutcomeCategory ].count().values
+    OutcomeCategoryRatio = OutcomeCategoryTable / sum( OutcomeCategoryTable )
+    possibleValues = inputdata[inputvariable].unique()
+    observed = []
+    expected = []
+    print(OutcomeCategoryTable)
+    print(OutcomeCategoryRatio)
+    print(possibleValues)
+
+
+    for possible in possibleValues:
+        countsInCategories = inputdata[ inputdata[ inputvariable ] == possible ].groupby( OutcomeCategory )[OutcomeCategory].count().values
+        if( len(countsInCategories) != len( OutcomeCategoryRatio ) ):
+            print("Error! The class " + str( possible) +" of \'" + inputvariable + "\' does not contain all values of \'" + OutcomeCategory + "\'" )
+            return
+        elif( min(countsInCategories) < 5 ):
+            print("Chi Squared Test needs at least 5 observations in each cell!")
+            print( inputvariable + "=" + str(possible) + " has insufficient data")
+            print( countsInCategories )
+            return
+        else:
+            observed.append( countsInCategories )
+            expected.append( OutcomeCategoryRatio * len( inputdata[inputdata[ inputvariable ] == possible ]))
+    observed = np.array( observed )
+    expected = np.array( expected )
+
+    chi_squared_stat = ((observed - expected)**2 / expected).sum().sum()
+    degOfF = (observed.shape[0] - 1 ) *(observed.shape[1] - 1 )
+    p_value = 1 - stats.chi2.cdf(x=chi_squared_stat, df=degOfF)
+    print("Calculated test-statistic is %.2f" % chi_squared_stat )
+    print("If " + OutcomeCategory + " is indep of " + inputvariable + ", this has prob %.2e of occurring" % p_value )
+CSTOW(data,'eduF','NEXT_MONTH_DEFAULT')
