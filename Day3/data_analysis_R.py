@@ -7,7 +7,7 @@ import seaborn as sns
 
 data = pd.read_csv("credit_card_default_train.csv")
 
-#testData=pd.read_csv("credit_card_default_test.csv")
+testData=pd.read_csv("credit_card_default_test.csv")
 
 def numeric(dataSheet):
     bal = dataSheet.Balance_Limit_V1
@@ -71,7 +71,10 @@ def numeric(dataSheet):
 
 data=numeric(data)
 data=data.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],axis=1)
+testData=numeric(testData)
+testData=testData.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],axis=1)
 cols = [ f for f in data.columns if data.dtypes[ f ] != "object"]
+colstest = [ f for f in testData.columns if testData.dtypes[ f ] != "object"]
 cols.remove('NEXT_MONTH_DEFAULT')
 f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT',  value_vars=cols)
 g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=5, sharex=False, sharey=False )
@@ -123,7 +126,25 @@ for n in ("DUE_AMT_JULY","DUE_AMT_AUG","DUE_AMT_SEP","DUE_AMT_OCT","DUE_AMT_NOV"
     qual_Enc.remove(n)
     data[ n] = data[n].apply( lambda x: np.log1p(x) if (x>0) else 0 )
     logged.append(n)
+###############################
+# The quantitative vars:
+quant = ["balF", "ageF"]
+# The qualitative but "Encoded" variables (ie most of them)
+qual_Enctest = colstest
+qual_Enctest.remove("balF")
+qual_Enctest.remove("ageF")
+loggedtest = []
+for m in ("PAID_AMT_JULY","PAID_AMT_AUG","PAID_AMT_SEP","PAID_AMT_OCT","PAID_AMT_NOV",'PAID_AMT_DEC'):
+    qual_Enctest.remove(m)
+    testData[m]  = testData[m].apply( lambda x: np.log1p(x) if (x>0) else 0 )
+    loggedtest.append(m)
 
+for n in ("DUE_AMT_JULY","DUE_AMT_AUG","DUE_AMT_SEP","DUE_AMT_OCT","DUE_AMT_NOV","DUE_AMT_DEC"):
+    qual_Enctest.remove(n)
+    testData[ n] = testData[n].apply( lambda x: np.log1p(x) if (x>0) else 0 )
+    loggedtest.append(n)
+
+################################
 f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT', value_vars=logged)
 g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=3, sharex=False, sharey=False )
 g = g.map( sns.distplot, "value", kde=True).add_legend()
@@ -132,18 +153,20 @@ features = quant + qual_Enc + logged + ['NEXT_MONTH_DEFAULT']
 corr = data[features].corr()
 plt.subplots(figsize=(30,10))
 sns.heatmap( corr, square=True, annot=True, fmt=".1f" )
+
 '''X_train=data.drop(["NEXT_MONTH_DEFAULT"],axis=1).values
 Y_train = data["NEXT_MONTH_DEFAULT"].values
 
 X_test = data.drop(["NEXT_MONTH_DEFAULT"],axis=1).values
 Y_test = data["NEXT_MONTH_DEFAULT"].values'''
-
+featurestest= quant + qual_Enctest + loggedtest
 features = quant + qual_Enc + logged
-X = data[features].values
-Y = data[ "NEXT_MONTH_DEFAULT" ].values
-
+X_train= data[features].values
+X_test= testData[featurestest].values
+Y_train= data[ "NEXT_MONTH_DEFAULT" ].values
+'''
 from sklearn.model_selection import train_test_split
-X_train, X_test, Y_train, Y_test = train_test_split( X, Y, test_size=0.2)
+X_train, X_test, Y_train, Y_test = train_test_split( X, Y, test_size=0.2)'''
 
 from sklearn.preprocessing import StandardScaler
 scX = StandardScaler()
@@ -153,6 +176,7 @@ X_test = scX.transform( X_test )
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import cross_val_score
 
+'''
 from sklearn.ensemble import RandomForestClassifier
 classifier = RandomForestClassifier(n_estimators=10)
 classifier.fit( X_train, Y_train )
@@ -169,10 +193,11 @@ classifier1 = SVC(kernel="rbf")
 classifier1.fit( X_train, Y_train )
 Y_pred = classifier1.predict( X_test )
 
-cm = confusion_matrix( Y_test, Y_pred )
+'''cm = confusion_matrix( Y_test, Y_pred )
 print("Accuracy on Test Set for kernel-SVM = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
 scoresSVC = cross_val_score( classifier1, X_train, Y_train, cv=10)
 print("Mean kernel-SVM CrossVal Accuracy on Train Set %.2f, with std=%.2f" % (scoresSVC.mean(), scoresSVC.std() ))
+'''
 '''
 from sklearn.linear_model import LogisticRegression
 classifier2 = LogisticRegression()
@@ -200,8 +225,9 @@ classifier4.fit( X_train, Y_train )
 Y_pred = classifier4.predict( X_test )
 cm = confusion_matrix( Y_test, Y_pred )
 print("Accuracy on Test Set for KNeighborsClassifier = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
-scoresKN = cross_val_score( classifier4, X_train, Y_train, cv=10)
+scoresKN = cross_val_score( classifier3, X_train, Y_train, cv=10)
 print("Mean KN CrossVal Accuracy on Train Set Set %.2f, with std=%.2f" % (scoresKN.mean(), scoresKN.std() ))
-
+'''
 df = pd.DataFrame(Y_pred)
 df.to_csv(r'a.csv')
+plt.show()
