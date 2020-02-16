@@ -190,7 +190,7 @@ print("Accuracy on Test Set for RandomForest = %.2f" % ((cm[0,0] + cm[1,1] )/len
 scoresRF = cross_val_score( classifier, X_train, Y_train, cv=10)
 print("Mean RandomForest CrossVal Accuracy on Train Set %.2f, with std=%.2f" % (scoresRF.mean(), scoresRF.std() ))
 print(Y_pred)
-'''
+
 from sklearn.svm import SVC
 classifier1 = SVC(kernel="rbf")
 classifier1.fit( X_train, Y_train )
@@ -200,8 +200,12 @@ Y_pred = classifier1.predict( X_test )
 print("Accuracy on Test Set for kernel-SVM = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
 scoresSVC = cross_val_score( classifier1, X_train, Y_train, cv=10)
 print("Mean kernel-SVM CrossVal Accuracy on Train Set %.2f, with std=%.2f" % (scoresSVC.mean(), scoresSVC.std() ))
+<<<<<<< HEAD:Day2/test/data_analysis_R.py
+
+=======
 '''
 '''
+>>>>>>> 179add2207234132708637e4c822f4fb41450efa:Day3/data_analysis_R.py
 from sklearn.linear_model import LogisticRegression
 classifier2 = LogisticRegression()
 classifier2.fit( X_train, Y_train )

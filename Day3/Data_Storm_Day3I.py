@@ -2,9 +2,14 @@ import tensorflow as tf
 import pandas as pd
 import seaborn as sns
 from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import Normalizer
+from sklearn.preprocessing import QuantileTransformer
+from sklearn.model_selection import train_test_split
 
-dataSetT = pd.read_csv("credit_card_default_train.csv",header=0)
-dataSetTs = pd.read_csv("credit_card_default_test.csv",header=0)
+trainDataSet = pd.read_csv("credit_card_default_train.csv",header=0)
+testDataSet = pd.read_csv("credit_card_default_test.csv",header=0)
+testClIds = testDataSet.Client_ID
 
 def numeric(dataSheet):
     bal = dataSheet.Balance_Limit_V1
@@ -70,35 +75,38 @@ def normDat(dataSet):
     return (dataSet-train_stats['mean'])/train_stats['std']
 
 def buildModel():
-    model = tf.keras.Sequential([tf.keras.layers.Dense(20,kernel_initializer="uniform",activation='relu',input_dim=23),tf.keras.layers.Dense(10,kernel_initializer="uniform",activation="sigmoid"),tf.keras.layers.Dense(5),tf.keras.layers.Dense(3),tf.keras.layers.Dense(1)])
+    model = tf.keras.Sequential([tf.keras.layers.Dense(2,kernel_initializer="uniform",activation='relu',input_dim=32)])
+    #model.add(tf.keras.layers.Dense(32,kernel_initializer="uniform",activation="sigmoid"))
+    #model.add(tf.keras.layers.Dense(16))
+    model.add(tf.keras.layers.Dense(8,activation="elu"))
+    '''model.add(tf.keras.layers.Dense(4))
+    model.add(tf.keras.layers.Dense(2))'''
+    model.add(tf.keras.layers.Dense(1,activation="sigmoid"))
     model.compile(loss='binary_crossentropy',optimizer="adam",metrics=["accuracy"])
     return model
 
-data=numeric(dataSetT)
-testData=numeric(dataSetTs)
+trainDataSet=pd.get_dummies(trainDataSet,columns=["Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],drop_first=True).drop(["Client_ID"],axis=1)
+testDataSet=pd.get_dummies(testDataSet,columns=["Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],drop_first=True).drop(["Client_ID"],axis=1)
 
+#trainDataSet=trainDataSet.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],axis=1)
+#testDatSet=testDataSet.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],axis=1)
 
-train_dat=data.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],axis=1)
-test_dat=testData.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATUS","MARITAL_STATUS","AGE"],axis=1)
-
-
-train_dat=train_dat.drop(["NEXT_MONTH_DEFAULT"],axis=1).values
-train_lab = data["NEXT_MONTH_DEFAULT"].values
-
-'''train_dat.drop(["NEXT_MONTH_DEFAULT"],axis=1).values
-train_lab = train_dat["NEXT_MONTH_DEFAULT"].values'''
-
+X_train = trainDataSet.drop(["NEXT_MONTH_DEFAULT"],axis=1).values
+Y_train = trainDataSet["NEXT_MONTH_DEFAULT"].values
+X_test = testDataSet.values
+#X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3)
 sc=StandardScaler()
-train_dat = sc.fit_transform(train_dat)
-test_dat = sc.transform(test_dat)
+mm=MinMaxScaler()
+nn=Normalizer()
+qt=QuantileTransformer()
+X_train = mm.fit_transform(X_train)
+X_test = mm.transform(X_test)
 
-print(train_dat)
-print(test_dat)
 
 model = buildModel()
 
-model.fit(train_dat,train_lab,batch_size=10,epochs=500)
-test_predictions = model.predict(test_dat).flatten()
+model.fit(X_train,Y_train,batch_size=10,epochs=1000)
+test_predictions = model.predict(X_test).flatten()
 
 print(test_predictions)
 tp=[]
@@ -110,7 +118,10 @@ for i in test_predictions:
         fin=0
     tp.append(fin)
 dataSheet=pd.DataFrame()
-dataSheet.insert(0,"Client_ID",testData.Client_ID)
+dataSheet.insert(0,"Client_ID",testClIds)
 dataSheet.insert(1,"NEXT_MONTH_DEFAULT",pd.DataFrame(tp))
 dataSheet.to_csv(r'AGNI_CODE_HUNTERS.csv')
- 
+
+'''from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(Y_test, tp)
+print(cm)'''

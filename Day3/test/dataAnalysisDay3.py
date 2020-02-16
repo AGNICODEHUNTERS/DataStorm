@@ -60,7 +60,7 @@ def numeric(dataSheet):
     return dataSheet
 
 def normDat(dataSet):
-    return (dataSet-train_stats['mean'])/train_stats['std']
+    return (dataSet-train_stats['mean '])/train_stats['std']
 
 def buildModel():
     model = tf.keras.Sequential([tf.keras.layers.Dense(20,kernel_initializer="uniform",activation='relu',input_dim=23),tf.keras.layers.Dense(10,kernel_initializer="uniform",activation="sigmoid"),tf.keras.layers.Dense(5),tf.keras.layers.Dense(3),tf.keras.layers.Dense(1)])
