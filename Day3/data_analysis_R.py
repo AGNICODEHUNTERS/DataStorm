@@ -228,6 +228,7 @@ print("Accuracy on Test Set for KNeighborsClassifier = %.2f" % ((cm[0,0] + cm[1,
 scoresKN = cross_val_score( classifier3, X_train, Y_train, cv=10)
 print("Mean KN CrossVal Accuracy on Train Set Set %.2f, with std=%.2f" % (scoresKN.mean(), scoresKN.std() ))
 '''
+
 df = pd.DataFrame(Y_pred)
 df.to_csv(r'a.csv')
 plt.show()
