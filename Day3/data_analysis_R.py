@@ -154,7 +154,7 @@ for i in logged:
     plt.savefig(i+"_log.png")
 features = quant + qual_Enc + logged + ['NEXT_MONTH_DEFAULT']
 corr = data[features].corr()
-plt.subplots(figsize=(30,10))
+plt.subplots(figsize=(30 ,10 ))
 sns.heatmap( corr, square=True, annot=True, fmt=".1f" )
 plt.savefig("heatmap.png")
 '''X_train=data.drop(["NEXT_MONTH_DEFAULT"],axis=1).values
