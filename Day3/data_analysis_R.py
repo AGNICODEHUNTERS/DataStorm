@@ -48,10 +48,9 @@ def numeric(dataSheet):
 
             if str(mar.iloc[i])=="Single":
                 marF.append(1)
-            elif str(mar.iloc[i])=="Married":
-                marF.append(2)
+
             else:
-                marF.append(3)
+                marF.append(2)
 
             if str(age.iloc[i])=="31-45":
                 ageF.append(1)
@@ -151,25 +150,28 @@ for i in logged:
     f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT', value_vars=i)
     g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=1, sharex=False, sharey=False )
     g = g.map( sns.distplot, "value", kde=True).add_legend()
-    plt.savefig(i+"_log.png")
+
 features = quant + qual_Enc + logged + ['NEXT_MONTH_DEFAULT']
 corr = data[features].corr()
-plt.subplots(figsize=(30 ,10 ))
+plt.subplots(figsize=(30,10))
 sns.heatmap( corr, square=True, annot=True, fmt=".1f" )
-plt.savefig("heatmap.png")
+
 '''X_train=data.drop(["NEXT_MONTH_DEFAULT"],axis=1).values
 Y_train = data["NEXT_MONTH_DEFAULT"].values
 
 X_test = data.drop(["NEXT_MONTH_DEFAULT"],axis=1).values
 Y_test = data["NEXT_MONTH_DEFAULT"].values'''
+
+X= data.drop(["NEXT_MONTH_DEFAULT"],axis=1).values
+Y=data["NEXT_MONTH_DEFAULT"].values
 featurestest= quant + qual_Enctest + loggedtest
 features = quant + qual_Enc + logged
-X_train= data[features].values
+'''X_train= data[features].values
 X_test= testData[featurestest].values
-Y_train= data[ "NEXT_MONTH_DEFAULT" ].values
-'''
+Y_train= data[ "NEXT_MONTH_DEFAULT" ].values'''
+
 from sklearn.model_selection import train_test_split
-X_train, X_test, Y_train, Y_test = train_test_split( X, Y, test_size=0.2)'''
+X_train, X_test, Y_train, Y_test = train_test_split( X, Y, test_size=0.2)
 
 from sklearn.preprocessing import StandardScaler
 scX = StandardScaler()
@@ -179,7 +181,6 @@ X_test = scX.transform( X_test )
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import cross_val_score
 
-'''
 from sklearn.ensemble import RandomForestClassifier
 classifier = RandomForestClassifier(n_estimators=10)
 classifier.fit( X_train, Y_train )
@@ -196,16 +197,12 @@ classifier1 = SVC(kernel="rbf")
 classifier1.fit( X_train, Y_train )
 Y_pred = classifier1.predict( X_test )
 
-'''cm = confusion_matrix( Y_test, Y_pred )
+cm = confusion_matrix( Y_test, Y_pred )
 print("Accuracy on Test Set for kernel-SVM = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
 scoresSVC = cross_val_score( classifier1, X_train, Y_train, cv=10)
 print("Mean kernel-SVM CrossVal Accuracy on Train Set %.2f, with std=%.2f" % (scoresSVC.mean(), scoresSVC.std() ))
-<<<<<<< HEAD:Day2/test/data_analysis_R.py
 
-=======
-'''
-'''
->>>>>>> 179add2207234132708637e4c822f4fb41450efa:Day3/data_analysis_R.py
+
 from sklearn.linear_model import LogisticRegression
 classifier2 = LogisticRegression()
 classifier2.fit( X_train, Y_train )
@@ -234,7 +231,43 @@ cm = confusion_matrix( Y_test, Y_pred )
 print("Accuracy on Test Set for KNeighborsClassifier = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
 scoresKN = cross_val_score( classifier3, X_train, Y_train, cv=10)
 print("Mean KN CrossVal Accuracy on Train Set Set %.2f, with std=%.2f" % (scoresKN.mean(), scoresKN.std() ))
-'''
+
+Ran = RandomForestClassifier(criterion= 'gini', max_depth= 6,
+                                     max_features= 5, n_estimators= 150,
+                                     random_state=0)
+Ran.fit(X_train, Y_train)
+Y_pred = Ran.predict(X_test)
+print('Accuracy:', metrics.accuracy_score(Y_pred,Y_test))
+
+## 5-fold cross-validation
+cv_scores =cross_val_score(Ran, X, Y, cv=5)
+
+# Print the 5-fold cross-validation scores
+print()
+print(classification_report(Y_test,Y_pred))
+print()
+print("Average 5-Fold CV Score: {}".format(round(np.mean(cv_scores),4)),
+      ", Standard deviation: {}".format(round(np.std(cv_scores),4)))
+
+plt.figure(figsize=(4,3))
+ConfMatrix = confusion_matrix(y_test,Ran.predict(X_test))
+sns.heatmap(ConfMatrix,annot=True, cmap="Blues", fmt="d",
+            xticklabels = ['Non-default', 'Default'],
+            yticklabels = ['Non-default', 'Default'])
+plt.ylabel('True label')
+plt.xlabel('Predicted label')
+plt.title("Confusion Matrix - Random Forest");
+
+
+
+
+
+
+
+
+
+
+
 
 df = pd.DataFrame(Y_pred)
 df.to_csv(r'a.csv')
