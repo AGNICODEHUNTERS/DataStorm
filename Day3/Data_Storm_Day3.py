@@ -45,10 +45,8 @@ def numeric(dataSheet):
 
             if str(mar.iloc[i])=="Single":
                 marF.append(1)
-            elif str(mar.iloc[i])=="Married":
+            elif str(mar.iloc[i])=="Other":
                 marF.append(2)
-            else:
-                marF.append(3)
 
             if str(age.iloc[i])=="31-45":
                 ageF.append(1)
@@ -113,4 +111,3 @@ dataSheet=pd.DataFrame()
 dataSheet.insert(0,"Client_ID",testData.Client_ID)
 dataSheet.insert(1,"NEXT_MONTH_DEFAULT",pd.DataFrame(tp))
 dataSheet.to_csv(r'AGNI_CODE_HUNTERS.csv')
- 
