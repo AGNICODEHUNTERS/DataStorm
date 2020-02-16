@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import scipy.stats as stats
 import seaborn as sns
 
+
 data = pd.read_csv("credit_card_default_train.csv")
 
 #testData=pd.read_csv("credit_card_default_test")
@@ -111,3 +112,32 @@ def CSTOW ( inputdata, inputvariable, OutcomeCategory ):
     print("Calculated test-statistic is %.2f" % chi_squared_stat )
     print("If " + OutcomeCategory + " is indep of " + inputvariable + ", this has prob %.2e of occurring" % p_value )
 CSTOW(data,'eduF','NEXT_MONTH_DEFAULT')
+# The quantitative vars:
+quant = ["balF", "ageF"]
+# The qualitative but "Encoded" variables (ie most of them)
+qual_Enc = cols
+qual_Enc.remove("balF")
+qual_Enc.remove("ageF")
+print(cols)
+logged = []
+for m in ("PAID_AMT_JULY","PAID_AMT_AUG","PAID_AMT_SEP","PAID_AMT_OCT","PAID_AMT_NOV",'PAID_AMT_DEC'):
+    qual_Enc.remove(m)
+    print(qual_Enc)
+    data[m]  = data[m].apply( lambda x: np.log1p(x) if (x>0) else 0 )
+    logged.append(m)
+
+for n in ("DUE_AMT_JULY","DUE_AMT_AUG","DUE_AMT_SEP","DUE_AMT_OCT","DUE_AMT_NOV","DUE_AMT_DEC"):
+    qual_Enc.remove(n)
+    print(qual_Enc)
+    data[ n] = data[n].apply( lambda x: np.log1p(x) if (x>0) else 0 )
+    logged.append(n)
+
+f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT', value_vars=logged)
+g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=3, sharex=False, sharey=False )
+g = g.map( sns.distplot, "value", kde=True).add_legend()
+
+features = quant + qual_Enc + logged + ['NEXT_MONTH_DEFAULT']
+corr = data[features].corr()
+plt.subplots(figsize=(30,10))
+sns.heatmap( corr, square=True, annot=True, fmt=".1f" )
+plt.show()
