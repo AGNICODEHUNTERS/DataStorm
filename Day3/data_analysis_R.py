@@ -76,9 +76,11 @@ testData=testData.drop(["Client_ID","Balance_Limit_V1","Gender","EDUCATION_STATU
 cols = [ f for f in data.columns if data.dtypes[ f ] != "object"]
 colstest = [ f for f in testData.columns if testData.dtypes[ f ] != "object"]
 cols.remove('NEXT_MONTH_DEFAULT')
-f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT',  value_vars=cols)
-g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=5, sharex=False, sharey=False )
-g = g.map( sns.distplot, "value", kde=True).add_legend()
+for i in cols:
+    f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT',  value_vars=i)
+    g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=1, sharex=False, sharey=False )
+    g = g.map( sns.distplot, "value", kde=True).add_legend()
+    #plt.savefig(i+".png")
 
 
 def CSTOW ( inputdata, inputvariable, OutcomeCategory ):
@@ -145,15 +147,16 @@ for n in ("DUE_AMT_JULY","DUE_AMT_AUG","DUE_AMT_SEP","DUE_AMT_OCT","DUE_AMT_NOV"
     loggedtest.append(n)
 
 ################################
-f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT', value_vars=logged)
-g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=3, sharex=False, sharey=False )
-g = g.map( sns.distplot, "value", kde=True).add_legend()
-
+for i in logged:
+    f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT', value_vars=i)
+    g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=1, sharex=False, sharey=False )
+    g = g.map( sns.distplot, "value", kde=True).add_legend()
+    plt.savefig(i+"_log.png")
 features = quant + qual_Enc + logged + ['NEXT_MONTH_DEFAULT']
 corr = data[features].corr()
 plt.subplots(figsize=(30,10))
 sns.heatmap( corr, square=True, annot=True, fmt=".1f" )
-
+plt.savefig("heatmap.png")
 '''X_train=data.drop(["NEXT_MONTH_DEFAULT"],axis=1).values
 Y_train = data["NEXT_MONTH_DEFAULT"].values
 
@@ -231,4 +234,3 @@ print("Mean KN CrossVal Accuracy on Train Set Set %.2f, with std=%.2f" % (scores
 
 df = pd.DataFrame(Y_pred)
 df.to_csv(r'a.csv')
-plt.show()
