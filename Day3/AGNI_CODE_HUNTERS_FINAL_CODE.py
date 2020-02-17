@@ -80,11 +80,10 @@ colstest = [ f for f in testData.columns if testData.dtypes[ f ] != "object"]
 cols.remove('NEXT_MONTH_DEFAULT')
 
 ###Exploratory Data Analysis###
-for i in cols:
-    f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT',  value_vars=i)
-    g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=1, sharex=False, sharey=False )
-    g = g.map( sns.distplot, "value", kde=True).add_legend()
-    plt.savefig(i+".png")
+f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT',  value_vars=cols)
+g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=5, sharex=False, sharey=False )
+g = g.map( sns.distplot, "value", kde=True).add_legend()
+#plt.savefig("data.png")
 
 ###Function for performing the ChiSquared Test Of Independence###
 def CSTOW ( inputdata, inputvariable, OutcomeCategory ):
@@ -158,10 +157,10 @@ for n in ("DUE_AMT_JULY","DUE_AMT_AUG","DUE_AMT_SEP","DUE_AMT_OCT","DUE_AMT_NOV"
     loggedtest.append(n)
 
 ###Exploratory Data Analysis for the logarithmic values###
-for i in logged:
-    f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT', value_vars=i)
-    g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=1, sharex=False, sharey=False )
-    g = g.map( sns.distplot, "value", kde=True).add_legend()
+
+f = pd.melt( data, id_vars='NEXT_MONTH_DEFAULT', value_vars=logged)
+g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=3, sharex=False, sharey=False )
+g = g.map( sns.distplot, "value", kde=True).add_legend()
 
 features = quantitative + qualitative_Encoded + logged + ['NEXT_MONTH_DEFAULT']
 corr = data[features].corr()
