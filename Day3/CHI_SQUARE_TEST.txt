@@ -1,0 +1,21 @@
+Chi Squared Test needs at least 5 observations in each cell!
+balF=2500000.0 has insufficient data
+Calculated test-statistic is 41.63
+If NEXT_MONTH_DEFAULT is indep of genF, this has prob 1.10e-10 of occurring
+Calculated test-statistic is 63.29
+If NEXT_MONTH_DEFAULT is indep of eduF, this has prob 1.81e-14 of occurring
+Calculated test-statistic is 18.69
+If NEXT_MONTH_DEFAULT is indep of marF, this has prob 1.54e-05 of occurring
+Calculated test-statistic is 30.65
+If NEXT_MONTH_DEFAULT is indep of ageF, this has prob 2.21e-07 of occurring
+Chi Squared Test needs at least 5 observations in each cell!
+PAY_JULY=7 has insufficient data
+Chi Squared Test needs at least 5 observations in each cell!
+PAY_AUG=6 has insufficient data
+Chi Squared Test needs at least 5 observations in each cell!
+PAY_SEP=1 has insufficient data
+Chi Squared Test needs at least 5 observations in each cell!
+PAY_OCT=6 has insufficient data
+Error! The class 8 of 'PAY_NOV' does not contain all values of 'NEXT_MONTH_DEFAULT'
+Chi Squared Test needs at least 5 observations in each cell!
+PAY_DEC=6 has insufficient data
