@@ -75,7 +75,7 @@ def normDat(dataSet):
     return (dataSet-train_stats['mean'])/train_stats['std']
 
 def buildModel():
-    model = tf.keras.Sequential([tf.keras.layers.Dense(2,kernel_initializer="uniform",activation='relu',input_dim=32)])
+    model = tf.keras.Sequential([tf.keras.layers.Dense(2,kernel_initializer="linear",activation='relu',input_dim=32)])
     #model.add(tf.keras.layers.Dense(32,kernel_initializer="uniform",activation="sigmoid"))
     #model.add(tf.keras.layers.Dense(16))
     model.add(tf.keras.layers.Dense(8,activation="elu"))
@@ -120,7 +120,7 @@ for i in test_predictions:
 dataSheet=pd.DataFrame()
 dataSheet.insert(0,"Client_ID",testClIds)
 dataSheet.insert(1,"NEXT_MONTH_DEFAULT",pd.DataFrame(tp))
-dataSheet.to_csv(r'AGNI_CODE_HUNTERS.csv')
+dataSheet.to_csv(r'AGNI_CODE_HUNTERSI.csv')
 
 '''from sklearn.metrics import confusion_matrix
 cm = confusion_matrix(Y_test, tp)
