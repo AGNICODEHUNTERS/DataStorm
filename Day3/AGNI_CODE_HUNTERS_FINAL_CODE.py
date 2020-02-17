@@ -115,8 +115,9 @@ def CSTOW ( inputdata, inputvariable, OutcomeCategory ):
     p_value = 1 - stats.chi2.cdf(x=chi_squared_stat, df=degOfF)
     print("Calculated test-statistic is %.2f" % chi_squared_stat )
     print("If " + OutcomeCategory + " is indep of " + inputvariable + ", this has prob %.2e of occurring" % p_value )
-for i in cols:
-    CSTOW(data,i,'NEXT_MONTH_DEFAULT')
+###Getting Chi Squared test values###
+'''for i in cols:
+    CSTOW(data,i,'NEXT_MONTH_DEFAULT')'''
 ###The quantitativeitative variables###
 quantitative = ["balF", "ageF"]
 
@@ -269,5 +270,6 @@ print("Mean KN CrossVal Accuracy on Train Set Set %.2f, with std=%.2f" % (scores
 dataSheet=pd.DataFrame()
 dataSheet.insert(0,"Client_ID",clID)
 dataSheet.insert(1,"NEXT_MONTH_DEFAULT",pd.DataFrame(Y_pred))
-dataSheet.to_csv(r'AGNI_CODE_HUNTERS.csv')
+dataSheet.to_csv(r'AGNI_CODE_HUNTERS.csv',index=0)
+###Plotting the graphs###
 plt.show()
