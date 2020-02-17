@@ -201,7 +201,7 @@ classifier = RandomForestClassifier(criterion= 'entropy', max_depth= 6, max_feat
 classifier.fit( X_train, Y_train )
 Y_pred = classifier.predict( X_test )
 ##Selecting the best parameters for classification###
-from sklearn.model_selection import RandomizedSearchCV
+'''from sklearn.model_selection import RandomizedSearchCV
 param_dist = {'n_estimators': [50,100,150,200,250],
                "max_features": [1,2,3,4,5,6,7,8,9],
                'max_depth': [1,2,3,4,5,6,7,8,9],
@@ -214,28 +214,26 @@ rf_cv = RandomizedSearchCV(rf, param_distributions = param_dist,
 
 rf_cv.fit(X_train, Y_train)
 
-print("Tuned Random Forest Parameters: %s" % (rf_cv.best_params_))
+print("Tuned Random Forest Parameters: %s" % (rf_cv.best_params_))'''
 ###Obtaining the acuuracy levels for Random Forest Classifier###
-cm = confusion_matrix( Y_test, Y_pred )
+'''cm = confusion_matrix( Y_test, Y_pred )
 print("Accuracy on Test Set for RandomForest = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
 scoresRF = cross_val_score( classifier, X_train, Y_train, cv=10)
 print("Mean RandomForest CrossVal Accuracy on Train Set %.2f, with std=%.2f" % (scoresRF.mean(), scoresRF.std() ))
-
+'''
 ###Kernel SVM Classifier###
-
-from sklearn.svm import SVC
+'''from sklearn.svm import SVC
 classifier1 = SVC(C=1.0, kernel='rbf', degree=3, gamma='scale', coef0=0.0, shrinking=True, probability=False, tol=0.001, cache_size=200, class_weight=None, verbose=False, max_iter=-1, decision_function_shape='ovr', break_ties=False, random_state=None)
 classifier1.fit( X_train, Y_train )
 Y_pred = classifier1.predict( X_test )
-
-###Obtaining the acuuracy levels for Kernel SVM Classifier###5
+###Obtaining the acuuracy levels for Kernel SVM Classifier###
 cm = confusion_matrix( Y_test, Y_pred )
 print("Accuracy on Test Set for kernel-SVM = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
 scoresSVC = cross_val_score( classifier1, X_train, Y_train, cv=10)
 print("Mean kernel-SVM CrossVal Accuracy on Train Set %.2f, with std=%.2f" % (scoresSVC.mean(), scoresSVC.std() ))
-
+'''
 ###Logistic Regression classification###
-from sklearn.linear_model import LogisticRegression
+'''from sklearn.linear_model import LogisticRegression
 classifier2 = LogisticRegression()
 classifier2.fit( X_train, Y_train )
 Y_pred = classifier2.predict( X_test )
@@ -244,9 +242,9 @@ cm = confusion_matrix( Y_test, Y_pred )
 print("Accuracy on Test Set for LogReg = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
 scoresLR = cross_val_score( classifier2, X_train, Y_train, cv=10)
 print("Mean LogReg CrossVal Accuracy on Train Set %.2f, with std=%.2f" % (scoresLR.mean(), scoresLR.std() ))
-
+'''
 ###Naive Bayes classification###
-from sklearn.naive_bayes import GaussianNB
+'''from sklearn.naive_bayes import GaussianNB
 classifier3 = GaussianNB()
 classifier3.fit( X_train, Y_train )
 Y_pred = classifier3.predict( X_test )
@@ -255,9 +253,9 @@ cm = confusion_matrix(Y_test, Y_pred )
 print("Accuracy on Test Set for NBClassifier = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
 scoresNB = cross_val_score( classifier3, X_train, Y_train, cv=10)
 print("Mean NaiveBayes CrossVal Accuracy on Train Set %.2f, with std=%.2f" % (scoresNB.mean(), scoresNB.std() ))
-
+'''
 ###K-neighbors Classification###
-from sklearn.neighbors import KNeighborsClassifier
+'''from sklearn.neighbors import KNeighborsClassifier
 classifier4 = KNeighborsClassifier(n_neighbors=5)
 classifier4.fit( X_train, Y_train )
 Y_pred = classifier4.predict( X_test )
@@ -266,9 +264,10 @@ cm = confusion_matrix( Y_test, Y_pred )
 print("Accuracy on Test Set for KNeighborsClassifier = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
 scoresKN = cross_val_score( classifier3, X_train, Y_train, cv=10)
 print("Mean KN CrossVal Accuracy on Train Set Set %.2f, with std=%.2f" % (scoresKN.mean(), scoresKN.std() ))
-
+'''
 ###exporting predictions as a csv file###
 dataSheet=pd.DataFrame()
 dataSheet.insert(0,"Client_ID",clID)
 dataSheet.insert(1,"NEXT_MONTH_DEFAULT",pd.DataFrame(Y_pred))
 dataSheet.to_csv(r'AGNI_CODE_HUNTERS.csv')
+plt.show()
