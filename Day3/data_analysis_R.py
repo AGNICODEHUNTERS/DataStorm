@@ -3,11 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 import seaborn as sns
-from sklearn import metrics
+
 
 data = pd.read_csv("credit_card_default_train.csv") #importing train data
 testData=pd.read_csv("credit_card_default_test.csv") #importing test data
-
+clID=testData.Client_ID
 ####function for converting literal values to numeric values###
 def numeric(dataSheet):
     bal = dataSheet.Balance_Limit_V1
@@ -121,38 +121,38 @@ for i in cols:
 quantitative = ["balF", "ageF"]
 
 # The qualitative, encoded variables###
-qual_Enc = cols
-qual_Enc.remove("balF")
-qual_Enc.remove("ageF")
+qualitative_Encoded = cols
+qualitative_Encoded.remove("balF")
+qualitative_Encoded.remove("ageF")
 logged = []
 
 ### The quantitativeitative variables for testData###
 quantitative = ["balF", "ageF"]
 ###The qualitative,encoded variables for testData###
-quantitative_Encoded = colstest
-quantitative_Encoded.remove("balF")
-quantitative_Encoded.remove("ageF")
+qualitative_Encoded_test = colstest
+qualitative_Encoded_test.remove("balF")
+qualitative_Encoded_test.remove("ageF")
 loggedtest = []
 
 ###converting data into logarithmic values###
 for m in ("PAID_AMT_JULY","PAID_AMT_AUG","PAID_AMT_SEP","PAID_AMT_OCT","PAID_AMT_NOV",'PAID_AMT_DEC'):
-    qual_Enc.remove(m)
+    qualitative_Encoded.remove(m)
     data[m]  = data[m].apply( lambda x: np.log1p(x) if (x>0) else 0 )
     logged.append(m)
 
 for n in ("DUE_AMT_JULY","DUE_AMT_AUG","DUE_AMT_SEP","DUE_AMT_OCT","DUE_AMT_NOV","DUE_AMT_DEC"):
-    qual_Enc.remove(n)
+    qualitative_Encoded.remove(n)
     data[ n] = data[n].apply( lambda x: np.log1p(x) if (x>0) else 0 )
     logged.append(n)
 
 
 for m in ("PAID_AMT_JULY","PAID_AMT_AUG","PAID_AMT_SEP","PAID_AMT_OCT","PAID_AMT_NOV",'PAID_AMT_DEC'):
-    quantitative_Encoded.remove(m)
+    qualitative_Encoded_test.remove(m)
     testData[m]  = testData[m].apply( lambda x: np.log1p(x) if (x>0) else 0 )
     loggedtest.append(m)
 
 for n in ("DUE_AMT_JULY","DUE_AMT_AUG","DUE_AMT_SEP","DUE_AMT_OCT","DUE_AMT_NOV","DUE_AMT_DEC"):
-    quantitative_Encoded.remove(n)
+    qualitative_Encoded_test.remove(n)
     testData[ n] = testData[n].apply( lambda x: np.log1p(x) if (x>0) else 0 )
     loggedtest.append(n)
 
@@ -162,7 +162,7 @@ for i in logged:
     g = sns.FacetGrid( f, hue='NEXT_MONTH_DEFAULT', col="variable", col_wrap=1, sharex=False, sharey=False )
     g = g.map( sns.distplot, "value", kde=True).add_legend()
 
-features = quantitative + qual_Enc + logged + ['NEXT_MONTH_DEFAULT']
+features = quantitative + qualitative_Encoded + logged + ['NEXT_MONTH_DEFAULT']
 corr = data[features].corr()
 plt.subplots(figsize=(30,10))
 sns.heatmap( corr, square=True, annot=True, fmt=".1f" )
@@ -173,11 +173,16 @@ Y_train = data["NEXT_MONTH_DEFAULT"].values
 
 X_test = data.drop(["NEXT_MONTH_DEFAULT"],axis=1).values
 Y_test = data["NEXT_MONTH_DEFAULT"].values'''
-
-X= data.drop(["NEXT_MONTH_DEFAULT"],axis=1).values
+'''
+X_train= data.drop(["NEXT_MONTH_DEFAULT"],axis=1).values
+Y_train=data["NEXT_MONTH_DEFAULT"].values
+X_test=testData.values
+'''
+X=data.drop(["NEXT_MONTH_DEFAULT"],axis=1).values
 Y=data["NEXT_MONTH_DEFAULT"].values
-featurestest= quantitative + quantitative_Encoded + loggedtest
-features = quantitative + qual_Enc + logged
+
+'''featurestest= quantitative + qualitative_Encoded_test + loggedtest
+features = quantitative + qualitative_Encoded + logged'''
 '''X_train= data[features].values
 X_test= testData[featurestest].values
 Y_train= data[ "NEXT_MONTH_DEFAULT" ].values'''
@@ -196,27 +201,42 @@ from sklearn.model_selection import cross_val_score
 
 ###Random Forest Classifier###
 from sklearn.ensemble import RandomForestClassifier
-classifier = RandomForestClassifier(n_estimators=10)
+classifier = RandomForestClassifier(criterion= 'entropy', max_depth= 6, max_features= 5, n_estimators= 150, random_state=0)
 classifier.fit( X_train, Y_train )
 Y_pred = classifier.predict( X_test )
+###
+'''from sklearn.model_selection import RandomizedSearchCV
+param_dist = {'n_estimators': [50,100,150,200,250],
+               "max_features": [1,2,3,4,5,6,7,8,9],
+               'max_depth': [1,2,3,4,5,6,7,8,9],
+               "criterion": ["gini", "entropy"]}
 
+rf = RandomForestClassifier()
+
+rf_cv = RandomizedSearchCV(rf, param_distributions = param_dist,
+                           cv = 5, random_state=0, n_jobs = -1)
+
+rf_cv.fit(X_train, Y_train)
+
+print("Tuned Random Forest Parameters: %s" % (rf_cv.best_params_))'''
 ###Obtaining the acuuracy levels for Random Forest Classifier###
 cm = confusion_matrix( Y_test, Y_pred )
-print("Accuracy of Test Set by RandomForest = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
+print("Accuracy on Test Set for RandomForest = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
 scoresRF = cross_val_score( classifier, X_train, Y_train, cv=10)
-print("Mean RandomForest CrossVal Accuracy on the Train Set %.2f, with std=%.2f" % (scoresRF.mean(), scoresRF.std() ))
+print("Mean RandomForest CrossVal Accuracy on Train Set %.2f, with std=%.2f" % (scoresRF.mean(), scoresRF.std() ))
 
 ###Kernel SVM Classifier###
+
 from sklearn.svm import SVC
-classifier1 = SVC(kernel="rbf")
+classifier1 = SVC(C=1.0, kernel='rbf', degree=3, gamma='scale', coef0=0.0, shrinking=True, probability=False, tol=0.001, cache_size=200, class_weight=None, verbose=False, max_iter=-1, decision_function_shape='ovr', break_ties=False, random_state=None)
 classifier1.fit( X_train, Y_train )
 Y_pred = classifier1.predict( X_test )
 
-###Obtaining the acuuracy levels for Kernel SVM Classifier###
+###Obtaining the acuuracy levels for Kernel SVM Classifier###5
 cm = confusion_matrix( Y_test, Y_pred )
-print("Accuracy of Test Set by kernel-SVM = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
+print("Accuracy on Test Set for kernel-SVM = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
 scoresSVC = cross_val_score( classifier1, X_train, Y_train, cv=10)
-print("Mean kernel-SVM CrossVal Accuracy on the Train Set %.2f, with std=%.2f" % (scoresSVC.mean(), scoresSVC.std() ))
+print("Mean kernel-SVM CrossVal Accuracy on Train Set %.2f, with std=%.2f" % (scoresSVC.mean(), scoresSVC.std() ))
 
 ###Logistic Regression classification###
 from sklearn.linear_model import LogisticRegression
@@ -225,9 +245,9 @@ classifier2.fit( X_train, Y_train )
 Y_pred = classifier2.predict( X_test )
 ###Obtaining the acuuracy levels for Logistic Regression###
 cm = confusion_matrix( Y_test, Y_pred )
-print("Accuracy of Test Set by LogReg = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
+print("Accuracy on Test Set for LogReg = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
 scoresLR = cross_val_score( classifier2, X_train, Y_train, cv=10)
-print("Mean LogReg CrossVal Accuracy on the Train Set %.2f, with std=%.2f" % (scoresLR.mean(), scoresLR.std() ))
+print("Mean LogReg CrossVal Accuracy on Train Set %.2f, with std=%.2f" % (scoresLR.mean(), scoresLR.std() ))
 
 ###Naive Bayes classification###
 from sklearn.naive_bayes import GaussianNB
@@ -236,9 +256,9 @@ classifier3.fit( X_train, Y_train )
 Y_pred = classifier3.predict( X_test )
 ###Obtaining the acuuracy levels for Naive Bayes classification###
 cm = confusion_matrix(Y_test, Y_pred )
-print("Accuracy of the Test Set by NBClassifier = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
+print("Accuracy on Test Set for NBClassifier = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
 scoresNB = cross_val_score( classifier3, X_train, Y_train, cv=10)
-print("Mean NaiveBayes CrossVal Accuracy on the Train Set %.2f, with std=%.2f" % (scoresNB.mean(), scoresNB.std() ))
+print("Mean NaiveBayes CrossVal Accuracy on Train Set %.2f, with std=%.2f" % (scoresNB.mean(), scoresNB.std() ))
 
 ###K-neighbors Classification###
 from sklearn.neighbors import KNeighborsClassifier
@@ -250,6 +270,9 @@ cm = confusion_matrix( Y_test, Y_pred )
 print("Accuracy on Test Set for KNeighborsClassifier = %.2f" % ((cm[0,0] + cm[1,1] )/len(X_test)))
 scoresKN = cross_val_score( classifier3, X_train, Y_train, cv=10)
 print("Mean KN CrossVal Accuracy on Train Set Set %.2f, with std=%.2f" % (scoresKN.mean(), scoresKN.std() ))
-###Exporting results into a csv file
-df = pd.DataFrame(Y_pred)
-df.to_csv(r'a.csv')
+'''
+###exporting predictions as a csv file###
+dataSheet=pd.DataFrame()
+dataSheet.insert(0,"Client_ID",clID)
+dataSheet.insert(1,"NEXT_MONTH_DEFAULT",pd.DataFrame(Y_pred))
+dataSheet.to_csv(r'abc.csv')'''
